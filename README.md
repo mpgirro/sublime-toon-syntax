@@ -34,7 +34,9 @@ bat sample.toon   # highlighted
 
 ## What gets highlighted
 
-Comments, keys (quoted and unquoted), array headers with length markers `[N]`, delimiter markers (`,` / tab / `|`) and `{field,lists}`, list items, double-quoted strings with escape validation, numbers, `true`/`false`/`null`. Tabular rows get value-token highlighting; they are deliberately not delimiter-aware (see `docs/adr/0001-stateless-line-oriented-highlighting.md`).
+Comments, keys (quoted and unquoted), array headers with length markers `[N]`, delimiter markers (`,` / tab / `|`) and `{field,lists}`, list items and their payloads (`- key: value`, nested headers), double-quoted strings with escape validation, numbers, `true`/`false`/`null`, inline primitive arrays (`tags[3]: a,b,c`), and tabs in indentation flagged as invalid.
+
+Tabular rows are delimiter-aware: only the delimiter declared in the header separates cells, and primitives highlight as complete cells only - `v1.2` stays plain, `7` lights up (see `docs/adr/0003-delimiter-aware-rows.md`).
 
 ## Development
 

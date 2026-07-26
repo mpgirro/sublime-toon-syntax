@@ -1,7 +1,9 @@
 %YAML 1.2
 ---
 # Syntax highlighting for TOON (https://toonformat.dev/)
-# Stateless line-oriented design: see docs/adr/0001-stateless-line-oriented-highlighting.md
+# Line-oriented design with delimiter-aware tabular rows:
+# see docs/adr/0001-stateless-line-oriented-highlighting.md and
+# docs/adr/0003-delimiter-aware-rows.md
 name: TOON
 file_extensions:
   - toon
@@ -10,14 +12,23 @@ scope: source.toon
 variables:
   unquoted_key: '[A-Za-z_][A-Za-z0-9_.]*'
   quoted_key: '"(?:[^"\\]|\\.)*"'
+  key_part: '(?:[A-Za-z_][A-Za-z0-9_.]*|"(?:[^"\\]|\\.)*")'
+  number: '-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?'
 
 contexts:
   main:
+    - include: illegal-indent
     - include: comment
-    - include: array-header
+    - include: headers
     - include: key-value
     - include: list-item
     - include: values
+
+  illegal-indent:
+    # spec forbids tabs in indentation
+    - match: '^ *(\t[ \t]*)'
+      captures:
+        1: invalid.illegal.indentation.toon
 
   comment:
     - match: '^ *(#).*$'
@@ -25,18 +36,42 @@ contexts:
       captures:
         1: punctuation.definition.comment.toon
 
-  array-header:
-    - match: '^ *({{unquoted_key}})(?=\[)'
+  # Array headers, optionally as a list-item payload (`- key[N]{f}:`) or
+  # key-less at root form. A field list means tabular rows follow: push the
+  # row context for the declared delimiter (comma is the default). Without a
+  # field list, primitive values may follow inline on the same line.
+  # Capture 1 (the indent) anchors the row context's dedent pop.
+  headers:
+    - match: '^( *)(?:(-) +)?({{key_part}})?(?=\[[0-9]+:?,?\]\{)'
       captures:
-        1: entity.name.tag.toon
-      push: header-brackets
-    - match: '^ *({{quoted_key}})(?=\[)'
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [rows-comma, header-brackets]
+    - match: "^( *)(?:(-) +)?({{key_part}})?(?=\\[[0-9]+:?\t\\]\\{)"
       captures:
-        1: entity.name.tag.toon
-      push: header-brackets
-    # root-form header without a key, e.g. `[2]{a,b}:`
-    - match: '^ *(?=\[[0-9])'
-      push: header-brackets
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [rows-tab, header-brackets]
+    - match: '^( *)(?:(-) +)?({{key_part}})?(?=\[[0-9]+:?\|\]\{)'
+      captures:
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [rows-pipe, header-brackets]
+    - match: '^( *)(?:(-) +)?({{key_part}})?(?=\[[0-9]+:?,?\](?!\{))'
+      captures:
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [inline-comma, header-brackets]
+    - match: "^( *)(?:(-) +)?({{key_part}})?(?=\\[[0-9]+:?\t\\](?!\\{))"
+      captures:
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [inline-tab, header-brackets]
+    - match: '^( *)(?:(-) +)?({{key_part}})?(?=\[[0-9]+:?\|\](?!\{))'
+      captures:
+        2: punctuation.definition.block.sequence.item.toon
+        3: entity.name.tag.toon
+      push: [inline-pipe, header-brackets]
 
   header-brackets:
     - match: '\['
@@ -77,14 +112,16 @@ contexts:
       pop: true
 
   key-value:
-    - match: '^ *({{unquoted_key}})(:)(?= |$)'
+    - match: '^ *(?:(-) +)?({{unquoted_key}})(:)(?= |$)'
       captures:
-        1: entity.name.tag.toon
-        2: punctuation.separator.key-value.toon
-    - match: '^ *({{quoted_key}})(:)(?= |$)'
+        1: punctuation.definition.block.sequence.item.toon
+        2: entity.name.tag.toon
+        3: punctuation.separator.key-value.toon
+    - match: '^ *(?:(-) +)?({{quoted_key}})(:)(?= |$)'
       captures:
-        1: entity.name.tag.toon
-        2: punctuation.separator.key-value.toon
+        1: punctuation.definition.block.sequence.item.toon
+        2: entity.name.tag.toon
+        3: punctuation.separator.key-value.toon
 
   list-item:
     - match: '^ *(-)(?= |$)'
@@ -95,12 +132,101 @@ contexts:
     - match: '"'
       scope: punctuation.definition.string.begin.toon
       push: double-quoted-string
-    - match: '(?<![\w.-])(-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)(?![\w.])'
+    - match: '(?<![\w.-])({{number}})(?![\w.])'
       scope: constant.numeric.toon
     - match: '(?<![\w.])(?:true|false)(?![\w.])'
       scope: constant.language.boolean.toon
     - match: '(?<![\w.])null(?![\w.])'
       scope: constant.language.null.toon
+
+  # Tabular row contexts (ADR-0003). \1 is the header line's indent: pop on
+  # the first non-blank, non-comment line not indented deeper than the header.
+  # Comment lines may appear inside a tabular block (spec strips them in a
+  # lexical pre-pass), so they must not pop.
+  rows-comma:
+    - include: comment
+    - match: '^(?!\1 |\s*$| *#)'
+      pop: true
+    - include: cells-comma
+
+  rows-tab:
+    - include: comment
+    - match: '^(?!\1 |\s*$| *#)'
+      pop: true
+    - include: cells-tab
+
+  rows-pipe:
+    - include: comment
+    - match: '^(?!\1 |\s*$| *#)'
+      pop: true
+    - include: cells-pipe
+
+  # Inline primitive arrays: values on the header line itself.
+  inline-comma:
+    - match: '$\n?'
+      pop: true
+    - include: cells-comma
+
+  inline-tab:
+    - match: '$\n?'
+      pop: true
+    - include: cells-tab
+
+  inline-pipe:
+    - match: '$\n?'
+      pop: true
+    - include: cells-pipe
+
+  # Cells: primitives match only as complete cells (anchored between line
+  # start / separator / line end); partial lookalikes like `v1.2` stay plain.
+  # The ':' boundary covers inline arrays right after the header colon.
+  cells-comma:
+    - match: '"'
+      scope: punctuation.definition.string.begin.toon
+      push: double-quoted-string
+    - match: '(?:^ *|(?<=[:,])) *({{number}})(?= *,| *$)'
+      captures:
+        1: constant.numeric.toon
+    - match: '(?:^ *|(?<=[:,])) *(true|false)(?= *,| *$)'
+      captures:
+        1: constant.language.boolean.toon
+    - match: '(?:^ *|(?<=[:,])) *(null)(?= *,| *$)'
+      captures:
+        1: constant.language.null.toon
+    - match: ','
+      scope: punctuation.separator.sequence.toon
+
+  cells-tab:
+    - match: '"'
+      scope: punctuation.definition.string.begin.toon
+      push: double-quoted-string
+    - match: "(?:^ *|(?<=[:\t])) *({{number}})(?= *\t| *$)"
+      captures:
+        1: constant.numeric.toon
+    - match: "(?:^ *|(?<=[:\t])) *(true|false)(?= *\t| *$)"
+      captures:
+        1: constant.language.boolean.toon
+    - match: "(?:^ *|(?<=[:\t])) *(null)(?= *\t| *$)"
+      captures:
+        1: constant.language.null.toon
+    - match: "\t"
+      scope: punctuation.separator.sequence.toon
+
+  cells-pipe:
+    - match: '"'
+      scope: punctuation.definition.string.begin.toon
+      push: double-quoted-string
+    - match: '(?:^ *|(?<=[:|])) *({{number}})(?= *\|| *$)'
+      captures:
+        1: constant.numeric.toon
+    - match: '(?:^ *|(?<=[:|])) *(true|false)(?= *\|| *$)'
+      captures:
+        1: constant.language.boolean.toon
+    - match: '(?:^ *|(?<=[:|])) *(null)(?= *\|| *$)'
+      captures:
+        1: constant.language.null.toon
+    - match: '\|'
+      scope: punctuation.separator.sequence.toon
 
   double-quoted-string:
     - meta_scope: string.quoted.double.toon

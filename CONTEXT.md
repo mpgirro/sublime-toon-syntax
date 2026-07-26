@@ -28,6 +28,10 @@ _Avoid_: record, table line, data line
 A `- value` line, one element of a non-uniform or mixed-type array.
 _Avoid_: sequence entry, bullet
 
+**Cell**:
+One delimiter-separated value within a tabular row.
+_Avoid_: field (reserved for names in a field list), column
+
 **Delimiter**:
 The character separating field names in a field list and values in a tabular row: comma, tab, or pipe.
 _Avoid_: separator (reserved for the `:` after a key)
