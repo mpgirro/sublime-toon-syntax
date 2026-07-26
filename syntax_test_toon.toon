@@ -1,0 +1,88 @@
+# SYNTAX TEST "Packages/sublime-toon/TOON.sublime-syntax"
+
+# plain comment
+# <- punctuation.definition.comment.toon
+#^^^^^^^^^^^^^^ comment.line.number-sign.toon
+
+  # indented comment
+# ^^^^^^^^^^^^^^^^^^ comment.line.number-sign.toon
+
+title: "hi\nthere"
+# <- entity.name.tag.toon
+#^^^^ entity.name.tag.toon
+#    ^ punctuation.separator.key-value.toon
+#      ^ string.quoted.double.toon punctuation.definition.string.begin.toon
+#       ^^ string.quoted.double.toon
+#         ^^ constant.character.escape.toon
+#                ^ punctuation.definition.string.end.toon
+
+bad: "\x"
+#     ^^ invalid.illegal.escape.toon
+
+count: -42
+#      ^^^ constant.numeric.toon
+
+pi: 3.14
+#   ^^^^ constant.numeric.toon
+
+big: 1e21
+#    ^^^^ constant.numeric.toon
+
+tiny: -1.5e-6
+#     ^^^^^^^ constant.numeric.toon
+
+flag: true
+#     ^^^^ constant.language.boolean.toon
+
+gone: null
+#     ^^^^ constant.language.null.toon
+
+"my-key": 7
+# <- entity.name.tag.toon
+#^^^^^^^ entity.name.tag.toon
+#       ^ punctuation.separator.key-value.toon
+#         ^ constant.numeric.toon
+
+users[2]{id,name}:
+# <- entity.name.tag.toon
+#^^^^ entity.name.tag.toon
+#    ^ punctuation.section.brackets.begin.toon
+#     ^ constant.numeric.toon
+#      ^ punctuation.section.brackets.end.toon
+#       ^ punctuation.section.braces.begin.toon
+#        ^^ variable.other.member.toon
+#          ^ punctuation.separator.sequence.toon
+#           ^^^^ variable.other.member.toon
+#               ^ punctuation.section.braces.end.toon
+#                ^ punctuation.separator.key-value.toon
+  1,Alice
+# ^ constant.numeric.toon
+  2,"Bob"
+# ^ constant.numeric.toon
+#   ^^^^^ string.quoted.double.toon
+
+tags[3|]:
+#     ^ punctuation.separator.sequence.toon
+
+ranks[2:]{gold}:
+#      ^ punctuation.separator.sequence.toon
+
+items[2]:
+  - first
+# ^ punctuation.definition.block.sequence.item.toon
+  - 42
+# ^ punctuation.definition.block.sequence.item.toon
+#   ^^ constant.numeric.toon
+
+[2]{a,b}:
+# <- punctuation.section.brackets.begin.toon
+#^ constant.numeric.toon
+# ^ punctuation.section.brackets.end.toon
+#  ^ punctuation.section.braces.begin.toon
+#   ^ variable.other.member.toon
+
+meta:
+  inner: true
+# ^^^^^ entity.name.tag.toon
+#      ^ punctuation.separator.key-value.toon
+#        ^^^^ constant.language.boolean.toon

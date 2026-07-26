@@ -1,0 +1,116 @@
+%YAML 1.2
+---
+# Syntax highlighting for TOON (https://toonformat.dev/)
+# Stateless line-oriented design: see docs/adr/0001-stateless-line-oriented-highlighting.md
+name: TOON
+file_extensions:
+  - toon
+scope: source.toon
+
+variables:
+  unquoted_key: '[A-Za-z_][A-Za-z0-9_.]*'
+  quoted_key: '"(?:[^"\\]|\\.)*"'
+
+contexts:
+  main:
+    - include: comment
+    - include: array-header
+    - include: key-value
+    - include: list-item
+    - include: values
+
+  comment:
+    - match: '^ *(#).*$'
+      scope: comment.line.number-sign.toon
+      captures:
+        1: punctuation.definition.comment.toon
+
+  array-header:
+    - match: '^ *({{unquoted_key}})(?=\[)'
+      captures:
+        1: entity.name.tag.toon
+      push: header-brackets
+    - match: '^ *({{quoted_key}})(?=\[)'
+      captures:
+        1: entity.name.tag.toon
+      push: header-brackets
+    # root-form header without a key, e.g. `[2]{a,b}:`
+    - match: '^ *(?=\[[0-9])'
+      push: header-brackets
+
+  header-brackets:
+    - match: '\['
+      scope: punctuation.section.brackets.begin.toon
+      push: bracket-body
+    - match: '\{'
+      scope: punctuation.section.braces.begin.toon
+      push: field-list
+    - match: ':'
+      scope: punctuation.separator.key-value.toon
+      pop: true
+    - match: '$|(?=\S)'
+      pop: true
+
+  bracket-body:
+    - match: '[0-9]+'
+      scope: constant.numeric.toon
+    # keyed-header ':' and the delimiter marker (comma, tab, or pipe)
+    - match: '[,|:\t]'
+      scope: punctuation.separator.sequence.toon
+    - match: '\]'
+      scope: punctuation.section.brackets.end.toon
+      pop: true
+    - match: '$'
+      pop: true
+
+  field-list:
+    - match: '{{unquoted_key}}'
+      scope: variable.other.member.toon
+    - match: '{{quoted_key}}'
+      scope: variable.other.member.toon
+    - match: '[,|\t]'
+      scope: punctuation.separator.sequence.toon
+    - match: '\}'
+      scope: punctuation.section.braces.end.toon
+      pop: true
+    - match: '$'
+      pop: true
+
+  key-value:
+    - match: '^ *({{unquoted_key}})(:)(?= |$)'
+      captures:
+        1: entity.name.tag.toon
+        2: punctuation.separator.key-value.toon
+    - match: '^ *({{quoted_key}})(:)(?= |$)'
+      captures:
+        1: entity.name.tag.toon
+        2: punctuation.separator.key-value.toon
+
+  list-item:
+    - match: '^ *(-)(?= |$)'
+      captures:
+        1: punctuation.definition.block.sequence.item.toon
+
+  values:
+    - match: '"'
+      scope: punctuation.definition.string.begin.toon
+      push: double-quoted-string
+    - match: '(?<![\w.-])(-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)(?![\w.])'
+      scope: constant.numeric.toon
+    - match: '(?<![\w.])(?:true|false)(?![\w.])'
+      scope: constant.language.boolean.toon
+    - match: '(?<![\w.])null(?![\w.])'
+      scope: constant.language.null.toon
+
+  double-quoted-string:
+    - meta_scope: string.quoted.double.toon
+    - match: '\\(?:[\\"nrt]|u[0-9A-Fa-f]{4})'
+      scope: constant.character.escape.toon
+    - match: '\\.'
+      scope: invalid.illegal.escape.toon
+    - match: '"'
+      scope: punctuation.definition.string.end.toon
+      pop: true
+    # strings do not span lines
+    - match: '$'
+      pop: true
