@@ -11,7 +11,7 @@ Fork https://github.com/sharkdp/bat, create branch `add-toon-syntax`.
 ```bash
 git submodule add https://github.com/mpgirro/sublime-toon-syntax.git assets/syntaxes/02_Extra/sublime-toon-syntax
 cd assets/syntaxes/02_Extra/sublime-toon-syntax
-git checkout 1.0.0   # pin the release tag commit
+git checkout 1.1.1   # pin the release tag commit
 cd -
 ```
 

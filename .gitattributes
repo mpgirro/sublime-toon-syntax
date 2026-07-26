@@ -1,0 +1,8 @@
+# Exclude non-package files from Package Control release archives
+.gitattributes export-ignore
+.github export-ignore
+AGENTS.md export-ignore
+CLAUDE.md export-ignore
+CONTEXT.md export-ignore
+docs export-ignore
+syntax_test_toon.toon export-ignore
