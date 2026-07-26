@@ -57,6 +57,7 @@ users[2]{id,name}:
 #                ^ punctuation.separator.key-value.toon
   1,Alice
 # ^ constant.numeric.toon
+#  ^ punctuation.separator.sequence.toon
   2,"Bob"
 # ^ constant.numeric.toon
 #   ^^^^^ string.quoted.double.toon
@@ -86,3 +87,59 @@ meta:
 # ^^^^^ entity.name.tag.toon
 #      ^ punctuation.separator.key-value.toon
 #        ^^^^ constant.language.boolean.toon
+
+hosts[2|]{name|city}:
+#             ^ punctuation.separator.sequence.toon
+  Anna Gruber|Vienna
+#            ^ punctuation.separator.sequence.toon
+  Ben|Osaka
+#    ^ punctuation.separator.sequence.toon
+
+pts[2	]{x	y}:
+#    ^ punctuation.separator.sequence.toon
+  7	8
+# ^ constant.numeric.toon
+#  ^ punctuation.separator.sequence.toon
+#   ^ constant.numeric.toon
+
+libs[2]{ver,n}:
+  v1.2,7
+#     ^ punctuation.separator.sequence.toon
+#      ^ constant.numeric.toon
+# ^^^^ - constant.numeric.toon
+
+words[3]: news,tech,science
+#             ^ punctuation.separator.sequence.toon
+#                  ^ punctuation.separator.sequence.toon
+
+nums[3|]: 1|2.5|null
+#         ^ constant.numeric.toon
+#          ^ punctuation.separator.sequence.toon
+#           ^^^ constant.numeric.toon
+#              ^ punctuation.separator.sequence.toon
+#               ^^^^ constant.language.null.toon
+
+records[2]:
+  - id: 7
+# ^ punctuation.definition.block.sequence.item.toon
+#   ^^ entity.name.tag.toon
+#     ^ punctuation.separator.key-value.toon
+#       ^ constant.numeric.toon
+
+matrix[1]:
+  - specs[2]{k,v}:
+# ^ punctuation.definition.block.sequence.item.toon
+#   ^^^^^ entity.name.tag.toon
+#        ^ punctuation.section.brackets.begin.toon
+    1,2
+#   ^ constant.numeric.toon
+#    ^ punctuation.separator.sequence.toon
+
+gaps[2]{n}:
+  1
+
+  2
+# ^ constant.numeric.toon
+
+	bad: true
+# <- invalid.illegal.indentation.toon
