@@ -1,42 +1,42 @@
 # bat submission
 
-Do this after the Package Control PR (the submodule should pin the `1.0.0` tag commit).
+Status: PREPPED, DO NOT SUBMIT YET. Branch `add-toon-syntax` is pushed to the
+fork https://github.com/mpgirro/bat and contains everything the PR needs.
 
-## 1. Fork and branch
+## Blocker: inclusion criteria
 
-Fork https://github.com/sharkdp/bat, create branch `add-toon-syntax`.
+bat's `doc/assets.md` requires **more than 10,000 downloads on
+packagecontrol.io** before a syntax qualifies for inclusion. Submit only after
+the Package Control package has crossed that bar (or upstream criteria change).
+Before submitting: rebase the branch on bat master and bump the submodule pin
+to the then-current release tag.
 
-## 2. Add the syntax as a submodule
+## What the branch contains
 
-```bash
-git submodule add https://github.com/mpgirro/sublime-toon-syntax.git assets/syntaxes/02_Extra/sublime-toon-syntax
-cd assets/syntaxes/02_Extra/sublime-toon-syntax
-git checkout 1.1.1   # pin the release tag commit
-cd -
-```
+- `assets/syntaxes/02_Extra/sublime-toon-syntax` submodule pinned at `1.1.1`
+- `tests/syntax-tests/source/TOON/sample.toon` (self-authored, MIT) + `LICENSE.md` note
+- `tests/syntax-tests/highlighted/TOON/sample.toon` fixture, generated with the
+  documented `update.sh` options (bat 0.26.1 + the same syntax content as the
+  pin; regenerate via `tests/syntax-tests/update.sh` if upstream CI disagrees)
+- CHANGELOG entry under `## Syntaxes` (replace `#XXXX` with the PR number after opening)
+- Deliberately NOT included: `assets/syntaxes.bin` (regenerated before each bat
+  release; PRs must not touch it, per `doc/assets.md`)
 
-## 3. Regression test sample
+## Open the PR (when eligible)
 
-Copy `docs/submission/bat/sample.toon` (from this repo) to
-`tests/syntax-tests/source/TOON/sample.toon` in the bat repo. The sample is
-self-authored for this purpose and MIT licensed - state that in the PR.
+https://github.com/sharkdp/bat/compare/master...mpgirro:bat:add-toon-syntax
 
-## 4. Regenerate assets and fixtures
+Title: `Add syntax highlighting support for TOON`
 
-Follow bat's current instructions in `doc/assets.md` (script names change; as of
-writing: `assets/create.sh` to rebuild the syntax set, then the syntax-test
-update script to generate `tests/syntax-tests/highlighted/TOON/`). Run the
-regression test suite and make sure TOON passes.
+Body draft:
 
-## 5. PR body draft
-
-> **Add syntax highlighting for TOON**
->
 > Adds TOON (https://toonformat.dev/, `.toon`), a compact JSON-equivalent data
 > format aimed at LLM prompts.
 >
-> - Syntax source: https://github.com/mpgirro/sublime-toon-syntax (MIT), pinned at `1.0.0`
-> - `version: 1` sublime-syntax; the repo's CI runs its 129 syntax-test
->   assertions under syntect itself, so syntect compatibility is enforced, not assumed
-> - Sample file is self-authored for this PR, MIT
-> - `Highlighting sample`: attach `bat` screenshot of `sample.toon` after building assets
+> - Syntax source: https://github.com/mpgirro/sublime-toon-syntax (MIT),
+>   pinned at its release tag; available on Package Control as "TOON" with
+>   <N> downloads
+> - `version: 1` sublime-syntax; the repo's CI runs its syntax tests under
+>   syntect itself, so syntect compatibility is enforced, not assumed
+> - Sample file is self-authored for this PR (MIT, see LICENSE.md next to it)
+> - Highlighting sample: <attach `bat` screenshot of sample.toon>

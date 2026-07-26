@@ -1,52 +1,43 @@
 # Package Control submission
 
-Order matters: tag first, then this PR, then the bat PR (see bat.md).
+Status: PREPPED. Branch `add-toon-syntax` is pushed to the fork
+https://github.com/mpgirro/package_control_channel with the `repository/t.json`
+entry (formatter-clean). Release `1.1.1` is tagged; `.gitattributes`
+export-ignores non-package files; packagecontrol.io has no existing TOON
+package (verified 2026-07-26).
 
-## 1. Prerequisites (this repo)
+## Open the PR
 
-- [ ] CI green on master
-- [ ] Push master to GitHub
-- [ ] Tag the release: `git tag 1.0.0 && git push origin 1.0.0` (plain semver, no `v` prefix)
-- [ ] Optional but recommended: add a screenshot to the README (listings without one look bare)
+https://github.com/wbond/package_control_channel/compare/master...mpgirro:package_control_channel:add-toon-syntax
 
-## 2. Channel PR
+Title: `Add TOON`
 
-Fork https://github.com/wbond/package_control_channel and add this entry to
-`repository/t.json` (alphabetical position within the file):
+Body (their PULL_REQUEST_TEMPLATE, boxes reflect actual state):
 
-```json
-{
-    "name": "TOON",
-    "details": "https://github.com/mpgirro/sublime-toon-syntax",
-    "labels": ["syntax", "language syntax", "toon"],
-    "releases": [
-        {
-            "sublime_text": "*",
-            "tags": true
-        }
-    ]
-}
+```markdown
+- [x] I'm the package's author and/or maintainer.
+- [x] I have read [the docs][1].
+- [x] I have tagged a release with a [semver][2] version number.
+- [x] My package repo has a description and a README describing what it's for and how to use it.
+- [x] My package doesn't add context menu entries. *
+- [x] My package doesn't add key bindings. **
+- [x] Any commands are available via the command palette.
+- [x] Preferences and keybindings (if any) are listed in the menu and the command palette, and open in split view.
+- [x] If my package is a syntax it doesn't also add a color scheme. ***
+- [x] I use [.gitattributes][3] to exclude files from the package: images, test files, sublime-project/workspace.
+
+[1]: https://docs.sublimetext.io/guide/package-control/submitting.html
+[2]: https://semver.org
+[3]: https://www.git-scm.com/docs/gitattributes#_export_ignore
+
+My package is a syntax highlighting package for TOON (Token-Oriented Object
+Notation, https://toonformat.dev/), a compact JSON-equivalent data format
+aimed at LLM prompts. It uses standard scope names, targets ST3 and ST4
+(`version: 1` sublime-syntax), and CI runs the official headless
+`syntax_tests` binary plus syntect on every change.
+
+There are no packages like it in Package Control.
 ```
 
-Run their validation locally before opening the PR (from the channel repo root):
-
-```bash
-python -m pytest tests  # or follow the channel repo's current CONTRIBUTING instructions
-```
-
-## 3. PR body draft
-
-> **Add TOON syntax package**
->
-> Adds syntax highlighting for TOON (https://toonformat.dev/), a compact
-> JSON-equivalent data format aimed at LLM prompts.
->
-> - Repo: https://github.com/mpgirro/sublime-toon-syntax
-> - `.sublime-syntax`, `version: 1` feature set, works on ST3 and ST4
-> - Standard scope names throughout, tested with 129 syntax-test assertions
-> - CI runs the official headless `syntax_tests` binary plus syntect
-> - MIT licensed
->
-> No existing package claims the `.toon` extension (checked packagecontrol.io search).
-
-Note: verify that last claim right before submitting - search https://packagecontrol.io/search/toon.
+Note (their AGENTS.md): the review is a human-to-human conversation - respond
+to reviewer feedback yourself.
