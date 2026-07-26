@@ -16,13 +16,16 @@ TOON syntax highlighting package for Sublime Text 3.
 
 ```bash
 # Install for local development (macOS): symlink repo into Sublime's Packages dir
-ln -s "$PWD" "$HOME/Library/Application Support/Sublime Text 3/Packages/sublime-toon"
+# Symlink name must be TOON: Package Control installs to Packages/TOON/ and the
+# syntax test header points there.
+ln -s "$PWD" "$HOME/Library/Application Support/Sublime Text 3/Packages/TOON"
 ```
 
 ## Testing
 
 - Write Sublime syntax tests: `syntax_test_*.toon` files whose first line is the syntax-test header comment pointing at the `.sublime-syntax` file.
 - Run them inside Sublime via Tools > Build on the test file. Highlighting changes ship only with passing syntax tests covering the changed rules.
+- No Sublime install on this machine: run tests headlessly via syntect's `syntest` instead (recipe in README > Development). syntect must stay green regardless - bat compatibility is a hard constraint (docs/adr/0002).
 
 ## External Docs
 

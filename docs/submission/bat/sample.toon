@@ -1,0 +1,30 @@
+# Podcast catalog export - sample TOON document
+# Authored for this repository (MIT), exercises every highlighted construct.
+
+catalog: "Indie Podcasts"
+version: 1.2
+generated: "2026-07-26T12:00:00Z"
+active: true
+retired: null
+"cache-ttl": 3600
+
+owner:
+  name: Max
+  "contact-email": "max@example.org"
+  score: -1.5e-6
+
+podcasts[3]{id,title,episodes,rating}:
+  1,"Tech Weekly",412,4.7
+  2,"History Hour",89,4.9
+  3,Zeitgeist,17,3.2
+
+hosts[2|]{name|city}:
+  Anna Gruber|Vienna
+  Ben Ito|Osaka
+
+tags[4]: news,tech,science,history
+
+notes[3]:
+  - "escaped \"quote\" and\ttab"
+  - 42
+  - false

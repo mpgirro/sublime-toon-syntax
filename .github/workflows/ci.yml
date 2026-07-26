@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  sublime:
+    name: Sublime Text syntax tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: SublimeText/syntax-test-action@v2
+        with:
+          build: stable
+          package_name: TOON
+
+  # bat renders through syntect; a rule that only ST understands must fail here.
+  # See docs/adr/0002-syntect-compatibility-constraint.md
+  syntect:
+    name: syntect (bat) compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Packages/TOON
+      - uses: actions/checkout@v4
+        with:
+          repository: trishume/syntect
+          path: syntect
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: syntect
+      - name: Build syntest
+        run: cargo build --example syntest --manifest-path syntect/Cargo.toml
+      - name: Run syntax tests under syntect
+        run: syntect/target/debug/examples/syntest Packages/TOON/syntax_test_toon.toon Packages
