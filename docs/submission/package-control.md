@@ -1,10 +1,13 @@
 # Package Control submission
 
-Status: PREPPED. Branch `add-toon-syntax` is pushed to the fork
-https://github.com/mpgirro/package_control_channel with the `repository/t.json`
-entry (formatter-clean). Release `1.1.1` is tagged; `.gitattributes`
-export-ignores non-package files; packagecontrol.io has no existing TOON
-package (verified 2026-07-26).
+Status: SUBMITTED 2026-07-26 - https://github.com/sublimehq/package_control_channel/pull/9496
+Reviews usually take a few weeks. Respond to reviewer feedback personally
+(their AGENTS.md: review is a human-to-human conversation).
+
+Branch `add-toon-syntax` on the fork https://github.com/mpgirro/package_control_channel
+carries the `repository/t.json` entry (formatter-clean). Release `1.1.1` is
+tagged; `.gitattributes` export-ignores non-package files; packagecontrol.io
+had no existing TOON package (verified 2026-07-26).
 
 ## Open the PR
 
